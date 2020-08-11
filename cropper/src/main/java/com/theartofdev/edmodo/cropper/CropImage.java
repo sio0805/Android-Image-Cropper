@@ -280,13 +280,32 @@ public final class CropImage {
 
     // remove documents intent
     if (!includeDocuments) {
-      for (Intent intent : intents) {
-        if (intent
-            .getComponent()
-            .getClassName()
-            .equals("com.android.documentsui.DocumentsActivity")) {
-          intents.remove(intent);
-          break;
+      if (Build.VERSION_CODES.Q <= Build.VERSION.SDK_INT){ // against os10's EXTRA_INITIAL_INTENTS
+        for (int i = intents.size() - 1; i >= 0; i--) { // Reduce even a little
+          if (intents.get(i)
+                  .getComponent()
+                  .getClassName()
+                  .equals("com.android.documentsui.DocumentsActivity")
+                  || intents.get(i)
+                  .getComponent()
+                  .getClassName()
+                  .equals("com.android.documentsui.picker.PickActivity")
+                  || intents.get(i)
+                  .getComponent()
+                  .getClassName()
+                  .equals("com.google.android.apps.docs.app.GetContentActivity")) {
+            intents.remove(i);
+          }
+        }
+      }else { // under os9
+        for (Intent intent : intents) {
+          if (intent
+                  .getComponent()
+                  .getClassName()
+                  .equals("com.android.documentsui.DocumentsActivity")) {
+            intents.remove(intent);
+            break;
+          }
         }
       }
     }
